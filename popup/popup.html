@@ -1,0 +1,66 @@
+// popup.html
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Webpage Saver</title>
+    <style>
+        body {
+            width: 300px;
+            font-family: Arial, sans-serif;
+            padding: 10px;
+        }
+
+        h1 {
+            font-size: 18px;
+            text-align: center;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            background-color: #4285f4;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #3367d6;
+        }
+
+        #status {
+            margin-top: 10px;
+            padding: 5px;
+            min-height: 20px;
+            text-align: center;
+        }
+
+        #savedPages {
+            margin-top: 10px;
+        }
+
+        ul {
+            padding-left: 20px;
+        }
+
+        li {
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Webpage Saver</h1>
+    <button id="saveButton">Save Current Page</button>
+    <div id="status"></div>
+    <div id="savedPages">
+        <h2>Saved Pages</h2>
+        <ul id="pagesList"></ul>
+    </div>
+    <script src="popup.js"></script>
+</body>
+
+</html>

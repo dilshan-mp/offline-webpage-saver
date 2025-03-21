@@ -1,0 +1,82 @@
+body {
+    width: 320px;
+    font-family: Arial, sans-serif;
+}
+
+.container {
+    padding: 15px;
+}
+
+h1 {
+    font-size: 18px;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+button {
+    padding: 10px;
+    cursor: pointer;
+    background-color: #4285f4;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-weight: bold;
+}
+
+button:hover {
+    background-color: #3367d6;
+}
+
+.status-message {
+    margin: 10px 0;
+    padding: 5px;
+    min-height: 20px;
+}
+
+.saved-pages {
+    margin-top: 15px;
+}
+
+.saved-pages h2 {
+    font-size: 16px;
+    margin-bottom: 10px;
+}
+
+#pages-list {
+    max-height: 200px;
+    overflow-y: auto;
+    padding-left: 10px;
+}
+
+#pages-list li {
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.page-link {
+    max-width: 200px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    cursor: pointer;
+    color: #1a73e8;
+}
+
+.delete-btn {
+    background-color: #ea4335;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 3px 6px;
+    cursor: pointer;
+    font-size: 12px;
+}
