@@ -1,51 +1,44 @@
 // popup.js
 document.addEventListener('DOMContentLoaded', function() {
-  const saveButton = document.getElementById('saveButton');
-  const statusElement = document.getElementById('status');
-  const pagesList = document.getElementById('pagesList');
+    const saveButton = document.getElementById('saveButton');
+    const statusElement = document.getElementById('status');
+    const pagesList = document.getElementById('pagesList');
+    const clearAllButton = document.getElementById('clearAllTextButton');
 
-  // Load saved pages
-  loadSavedPages();
+    loadSavedPages();
 
-  // Add click handler for save button
-  saveButton.addEventListener('click', function() {
-    saveCurrentPage();
-  });
+    saveButton.addEventListener('click', saveCurrentPage);
+    clearAllButton.addEventListener('click', clearAllSavedPages);
 
-  // Function to save the current page
-  function saveCurrentPage() {
-    statusElement.textContent = 'Saving page...';
+    function saveCurrentPage() {
+        statusElement.textContent = 'Saving page...';
 
-    // Get current tab
-    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-      if (!tabs || !tabs[0]) {
-        statusElement.textContent = 'Error: No active tab found';
-        return;
-      }
+        chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+            if (!tabs || !tabs[0]) {
+                statusElement.textContent = 'Error: No active tab found';
+                return;
+            }
 
-      const tab = tabs[0];
-      const url = tab.url;
-      const title = tab.title;
+            const tab = tabs[0];
+            const url = tab.url;
+            const title = tab.title;
 
-      // Execute script to get page content
-      chrome.scripting.executeScript({
-        target: {tabId: tab.id},
-        function: getPageContent
-      }, function(results) {
-        if (chrome.runtime.lastError) {
-          statusElement.textContent = 'Error: ' + chrome.runtime.lastError.message;
-          return;
-        }
+            chrome.scripting.executeScript({
+                target: { tabId: tab.id },
+                function: getPageContent
+            }, function(results) {
+                if (chrome.runtime.lastError) {
+                    statusElement.textContent = 'Error: ' + chrome.runtime.lastError.message;
+                    return;
+                }
 
-        if (!results || !results[0]) {
-          statusElement.textContent = 'Error: Could not get page content';
-          return;
-        }
+                if (!results || !results[0]) {
+                    statusElement.textContent = 'Error: Could not get page content';
+                    return;
+                }
 
-        const pageContent = results[0].result;
-        
-        // Generate HTML file
-        const htmlContent = `
+                const pageContent = results[0].result;
+                const htmlContent = `
 <!DOCTYPE html>
 <html>
 <head>
@@ -76,112 +69,155 @@ document.addEventListener('DOMContentLoaded', function() {
 </body>
 </html>`;
 
-        // Create a sanitized filename
-        const filename = title.replace(/[^a-z0-9]/gi, '_').toLowerCase().substring(0, 50) + '.html';
-        
-        // Create a blob with the HTML content
-        const blob = new Blob([htmlContent], {type: 'text/html'});
-        const blobUrl = URL.createObjectURL(blob);
+                const filename = title.replace(/[^a-z0-9]/gi, '_').toLowerCase().substring(0, 50) + '.html';
+                const blob = new Blob([htmlContent], { type: 'text/html' });
+                const blobUrl = URL.createObjectURL(blob);
 
-        // Download the file
-        chrome.downloads.download({
-          url: blobUrl,
-          filename: 'saved_pages/' + filename,
-          saveAs: false
-        }, function(downloadId) {
-          if (chrome.runtime.lastError) {
-            statusElement.textContent = 'Error: ' + chrome.runtime.lastError.message;
-            return;
-          }
-          
-          // Save to storage
-          savePage(url, title, downloadId);
-          statusElement.textContent = 'Page saved successfully!';
+                chrome.downloads.download({
+                    url: blobUrl,
+                    filename: 'saved_pages/' + filename,
+                    saveAs: false
+                }, function(downloadId) {
+                    if (chrome.runtime.lastError) {
+                        statusElement.textContent = 'Error: ' + chrome.runtime.lastError.message;
+                        return;
+                    }
+
+                    savePage(url, title, downloadId);
+                    statusElement.textContent = 'Page saved successfully!';
+                });
+            });
         });
-      });
-    });
-  }
+    }
 
-  // Function to save page info to storage
-  function savePage(url, title, downloadId) {
-    chrome.storage.local.get({savedPages: []}, function(data) {
-      const savedPages = data.savedPages;
-      savedPages.push({
-        url: url,
-        title: title,
-        downloadId: downloadId,
-        date: new Date().toISOString()
-      });
-      
-      chrome.storage.local.set({savedPages: savedPages}, function() {
-        loadSavedPages();
-      });
-    });
-  }
+    function savePage(url, title, downloadId) {
+        chrome.storage.local.get({ savedPages: [] }, function(data) {
+            const savedPages = data.savedPages;
+            savedPages.push({
+                url: url,
+                title: title,
+                downloadId: downloadId,
+                date: new Date().toISOString()
+            });
 
-  // Function to load saved pages
-  function loadSavedPages() {
-    chrome.storage.local.get({savedPages: []}, function(data) {
-      const savedPages = data.savedPages;
-      
-      pagesList.innerHTML = '';
-      
-      if (savedPages.length === 0) {
-        pagesList.innerHTML = '<li>No pages saved yet</li>';
-        return;
-      }
-      
-      savedPages.forEach(function(page, index) {
-        const li = document.createElement('li');
-        
-        const link = document.createElement('a');
-        link.textContent = page.title || page.url;
-        link.href = '#';
-        link.title = page.url;
-        link.onclick = function() {
-          chrome.downloads.show(page.downloadId);
-          return false;
-        };
-        
-        li.appendChild(link);
-        pagesList.appendChild(li);
-      });
-    });
-  }
+            chrome.storage.local.set({ savedPages: savedPages }, function() {
+                loadSavedPages();
+            });
+        });
+    }
 
-  // Helper function to escape HTML
-  function escapeHTML(str) {
-    return str
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#039;');
-  }
+    function loadSavedPages() {
+        chrome.storage.local.get({ savedPages: [] }, function(data) {
+            const savedPages = data.savedPages;
+
+            pagesList.innerHTML = '';
+
+            if (savedPages.length === 0) {
+                pagesList.innerHTML = '<li>No pages saved yet</li>';
+                return;
+            }
+
+            savedPages.forEach(function(page, index) {
+                const li = document.createElement('li');
+                const link = document.createElement('a');
+                link.textContent = page.title || page.url;
+                link.href = '#';
+                link.title = page.url;
+                link.onclick = function() {
+                    chrome.downloads.show(page.downloadId);
+                    return false;
+                };
+
+                li.appendChild(link);
+                pagesList.appendChild(li);
+            });
+        });
+    }
+
+
+
+    async function clearAllSavedPages() {
+        if (!confirm("Are you sure you want to clear all saved pages? This cannot be undone.")) {
+            return;
+        }
+
+        statusElement.textContent = 'Clearing saved pages...';
+
+        try {
+            const data = await chrome.storage.local.get({ savedPages: [] });
+            const savedPages = data.savedPages;
+
+            // Use Promise.all to wait for all removals to complete
+            await Promise.all(savedPages.map(page => removePage(page)));
+
+            // Clear storage *after* all removals are done
+            await chrome.storage.local.set({ savedPages: [] });
+            loadSavedPages();
+            statusElement.textContent = 'All pages cleared!';
+        } catch (error) {
+            console.error("Error clearing saved pages:", error);
+            statusElement.textContent = 'Error clearing saved pages. See console for details.';
+        }
+    }
+
+
+    // Helper function to remove a single page (wrapped in a Promise)
+    function removePage(page) {
+        return new Promise(async (resolve, reject) => {
+            if (page.downloadId) {
+                try {
+                    await new Promise((res, rej) => {
+                        chrome.downloads.removeFile(page.downloadId, () => {
+                            if (chrome.runtime.lastError) {
+                                console.error("Error removing file:", chrome.runtime.lastError);
+                                // Don't reject; resolve to continue with other deletions
+                            }
+                            res();
+                        });
+                    });
+
+                    await new Promise((res, rej) => {
+                         chrome.downloads.erase({ id: page.downloadId },(e)=>{
+                            if (chrome.runtime.lastError) {
+                                console.error("Error erasing download:", chrome.runtime.lastError);
+                            }
+                            res();
+                         });
+                    });
+                    resolve(); // Resolve after successful removal and erasure
+                } catch (error) {
+                    console.error("Error in removePage:", error);
+                    resolve();  //resolve even on error.
+                }
+            } else {
+                resolve(); // Resolve immediately if there's no downloadId
+            }
+        });
+    }
+
+
+    function escapeHTML(str) {
+        return str
+            .replace(/&/g, '&')
+            .replace(/</g, '<')
+            .replace(/>/g, '>')
+            .replace(/"/g, '"')
+            .replace(/'/g, '&#39;');
+    }
 });
 
-// Function to get page content - will be executed in page context
 function getPageContent() {
-  // Get all styles
-  let styles = '';
-  
-  // Get inline styles
-  const styleElements = document.querySelectorAll('style');
-  for (const style of styleElements) {
-    styles += '<style>' + style.textContent + '</style>\n';
-  }
-  
-  // Get linked stylesheets
-  const linkElements = document.querySelectorAll('link[rel="stylesheet"]');
-  for (const link of linkElements) {
-    styles += '<link rel="stylesheet" href="' + link.href + '">\n';
-  }
-  
-  // Get body content
-  const bodyContent = document.body.innerHTML;
-  
-  return {
-    styles: styles,
-    body: bodyContent
-  };
+    let styles = '';
+    const styleElements = document.querySelectorAll('style');
+    for (const style of styleElements) {
+        styles += '<style>' + style.textContent + '</style>\n';
+    }
+
+    const linkElements = document.querySelectorAll('link[rel="stylesheet"]');
+    for (const link of linkElements) {
+        styles += '<link rel="stylesheet" href="' + link.href + '">\n';
+    }
+
+    const bodyContent = document.body.innerHTML;
+    return { styles: styles, body: bodyContent };
 }

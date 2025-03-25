@@ -1,53 +1,121 @@
-// popup.html
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Webpage Saver</title>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
         body {
-            width: 300px;
-            font-family: Arial, sans-serif;
-            padding: 10px;
+            width: 320px;
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
         }
 
         h1 {
-            font-size: 18px;
+            font-size: 20px;
             text-align: center;
+            color: #333;
+            margin-bottom: 15px;
         }
 
         button {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            background-color: #4285f4;
+            padding: 12px;
+            background: linear-gradient(135deg, #4285f4, #1a73e8);
             color: white;
             border: none;
-            border-radius: 4px;
+            border-radius: 6px;
             cursor: pointer;
+            font-size: 14px;
+            transition: 0.3s;
         }
 
         button:hover {
-            background-color: #3367d6;
+            background: linear-gradient(135deg, #3367d6, #1251b5);
+        }
+
+        #saveButton {
+            width: 100%;
+            margin-top: 10px;
         }
 
         #status {
             margin-top: 10px;
-            padding: 5px;
+            padding: 8px;
             min-height: 20px;
             text-align: center;
+            font-size: 14px;
+            color: #4caf50;
         }
 
-        #savedPages {
+        .saved-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #ffffff;
+            padding: 10px;
+            border-radius: 6px;
             margin-top: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .saved-container h2 {
+            font-size: 16px;
+            color: #333;
+            flex-grow: 1;
+        }
+
+        #clearAllTextButton {
+            background: none;
+            border: none;
+            color: #db4437;
+            cursor: pointer;
+            font-size: 12px;
+            text-decoration: underline;
+            transition: 0.3s;
+            margin-left: auto;
+        }
+
+        #clearAllTextButton:hover {
+            text-decoration: none;
+            color: #b71c1c;
         }
 
         ul {
-            padding-left: 20px;
+            padding: 0;
+            list-style: none;
+            margin-top: 10px;
         }
 
         li {
+            background: #ffffff;
+            padding: 8px 12px;
             margin-bottom: 5px;
+            border-radius: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        li a {
+            text-decoration: none;
+            color: #4285f4;
+            font-size: 14px;
+            transition: 0.3s;
+        }
+
+        li a:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
@@ -56,10 +124,11 @@
     <h1>Webpage Saver</h1>
     <button id="saveButton">Save Current Page</button>
     <div id="status"></div>
-    <div id="savedPages">
+    <div class="saved-container">
         <h2>Saved Pages</h2>
-        <ul id="pagesList"></ul>
+        <button id="clearAllTextButton">Clear All</button>
     </div>
+    <ul id="pagesList"></ul>
     <script src="popup.js"></script>
 </body>
 

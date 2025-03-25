@@ -1,5 +1,3 @@
-// content.js - FIXED
-// Listen for pings to check if content script is loaded
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   if (request.action === 'ping') {
     sendResponse({status: 'ready'});
